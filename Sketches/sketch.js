@@ -5,19 +5,25 @@ const settings = {
   animate: true,
 };
 
-const sketch = () => {
+const sketch = ({ context, width, height }) => {
   let x = 0;
   let y = 0;
 
-  return ({ context, width, height }) => {
-    // Make the Canvas
-    context.fillStyle = "white";
-    context.fillRect(0, 0, width, height);
+  // Make Canvas
+  context.fillStyle = "white";
+  context.fillRect(0, 0, width, height);
 
+  return ({ context, width, height, frame }) => {
     x += 10;
 
+    if (x > 460) {
+      y += 240;
+      x = 0;
+    }
+
     // re-diffine fillStyle
-    context.fillStyle = "black";
+    context.fillStyle = frame % 2 ? "black" : "orange";
+    context.strokeStyle = context.fillStyle;
 
     // Set Line width
     context.lineWidth = 10;
