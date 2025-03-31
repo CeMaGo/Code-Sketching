@@ -26,6 +26,13 @@ const sketch = ({ context, width, height }) => {
 
   const bg = random.pick(risoColors).hex;
 
+  const mask = {
+    radius: width * 0.4,
+    sides: 3,
+    x: width * 0.5,
+    y: height * 0.5,
+  };
+
   for (let i = 0; i < num; i++) {
     x = random.range(0, width);
     y = random.range(0, height);
@@ -45,13 +52,10 @@ const sketch = ({ context, width, height }) => {
     context.fillRect(0, 0, width, height);
 
     context.save();
-    context.translate(width * 0.5, height * 0.5);
+    context.translate(mask.x, mask.y);
 
-    drawPolygon({ context, radius: 400, sides: 3 });
+    drawPolygon({ context, radius: mask.radius, sides: mask.sides });
 
-    context.lineWidth = 10;
-    context.strokeStyle = "black";
-    context.stroke();
     context.clip();
 
     rects.forEach((rect) => {
@@ -60,8 +64,9 @@ const sketch = ({ context, width, height }) => {
       // start a draw
       context.save();
 
-      context.translate(width * -0.5, height * -0.5);
+      context.translate(-mask.x, -mask.y);
       context.translate(x, y);
+
       context.strokeStyle = stroke;
       context.fillStyle = fill;
       context.lineWidth = 10;
@@ -86,10 +91,22 @@ const sketch = ({ context, width, height }) => {
       context.strokeStyle = "black";
       context.stroke();
 
-      context.stroke();
-
       context.restore();
     });
+
+    context.restore();
+
+    // polygon outline draw
+    context.save();
+    context.translate(mask.x, mask.y);
+
+    drawPolygon({ context, radius: mask.radius, sides: mask.sides });
+
+    context.lineWidth = 10;
+    context.strokeStyle = "black";
+    context.stroke();
+
+    context.restore();
   };
 };
 
@@ -119,7 +136,7 @@ const drawPolygon = ({ context, radius = 100, sides = 3 }) => {
   context.moveTo(0, -radius);
 
   for (let i = 1; i < sides; i++) {
-    const theta = i * slice;
+    const theta = i * slice - Math.PI * 0.5;
     context.lineTo(Math.cos(theta) * radius, Math.sin(theta) * radius);
   }
 
