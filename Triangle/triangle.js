@@ -77,6 +77,21 @@ const sketch = ({ context, width, height }) => {
       context.stroke();
 
       context.restore();
+
+      context.save();
+      context.translate(width * 0.5, height * 0.5);
+
+      context.beginPath();
+      context.moveTo(0, -300);
+      context.lineTo(300, 200);
+      context.lineTo(-300, 200);
+      context.closePath();
+
+      context.lineWidth = 10;
+      context.strokeStyle = "black";
+      context.stroke();
+
+      context.restore();
     });
   };
 };
@@ -94,7 +109,6 @@ const drawSkewedRect = ({ context, w = 600, h = 200, degrees = -45 }) => {
   context.lineTo(rx, ry);
   context.lineTo(rx, ry + h);
   context.lineTo(0, h);
-  context.closePath();
   context.stroke();
 
   context.restore();
