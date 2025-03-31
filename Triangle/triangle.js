@@ -47,11 +47,7 @@ const sketch = ({ context, width, height }) => {
     context.save();
     context.translate(width * 0.5, height * 0.5);
 
-    context.beginPath();
-    context.moveTo(0, -300);
-    context.lineTo(300, 200);
-    context.lineTo(-300, 200);
-    context.closePath();
+    drawPolygon({ context, radius: 400, sides: 3 });
 
     context.lineWidth = 10;
     context.strokeStyle = "black";
@@ -114,6 +110,20 @@ const drawSkewedRect = ({ context, w = 600, h = 200, degrees = -45 }) => {
 
   context.restore();
   // end a draw
+};
+
+const drawPolygon = ({ context, radius = 100, sides = 3 }) => {
+  const slice = (Math.PI * 2) / sides;
+
+  context.beginPath();
+  context.moveTo(0, -radius);
+
+  for (let i = 1; i < sides; i++) {
+    const theta = i * slice;
+    context.lineTo(Math.cos(theta) * radius, Math.sin(theta) * radius);
+  }
+
+  context.closePath();
 };
 
 canvasSketch(sketch, settings);
