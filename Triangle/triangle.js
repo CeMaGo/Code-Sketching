@@ -51,8 +51,15 @@ const sketch = ({ context, width, height }) => {
       context.lineWidth = 10;
 
       drawSkewedRect({ context, w, h, degrees });
-      context.stroke();
+
+      context.shadowColor = "black";
+      context.shadowOffsetX = -10;
+      context.shadowOffsetY = 20;
+
       context.fill();
+      context.shadowColor = null;
+
+      context.stroke();
 
       context.restore();
     });
