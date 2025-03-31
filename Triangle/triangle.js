@@ -30,7 +30,7 @@ const sketch = ({ context, width, height }) => {
     radius: width * 0.4,
     sides: 3,
     x: width * 0.5,
-    y: height * 0.5,
+    y: height * 0.58,
   };
 
   for (let i = 0; i < num; i++) {
@@ -99,11 +99,17 @@ const sketch = ({ context, width, height }) => {
     // polygon outline draw
     context.save();
     context.translate(mask.x, mask.y);
+    context.lineWidth = 20;
 
-    drawPolygon({ context, radius: mask.radius, sides: mask.sides });
+    drawPolygon({
+      context,
+      radius: mask.radius - context.lineWidth,
+      sides: mask.sides,
+    });
 
-    context.lineWidth = 10;
-    context.strokeStyle = "black";
+    context.globalCompositeOperation = "color-burn";
+
+    context.strokeStyle = rectColors[0].hex;
     context.stroke();
 
     context.restore();
