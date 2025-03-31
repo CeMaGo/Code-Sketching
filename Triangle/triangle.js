@@ -52,6 +52,8 @@ const sketch = ({ context, width, height }) => {
       context.fillStyle = fill;
       context.lineWidth = 10;
 
+      context.globalCompositeOperation = "overlay";
+
       drawSkewedRect({ context, w, h, degrees });
 
       shadowColor = Color.offsetHSL(fill, 0, 0, -20);
@@ -63,6 +65,8 @@ const sketch = ({ context, width, height }) => {
 
       context.fill();
       context.shadowColor = null;
+
+      context.globalCompositeOperation = "source-over";
 
       context.lineWidth = 2;
       context.strokeStyle = "black";
