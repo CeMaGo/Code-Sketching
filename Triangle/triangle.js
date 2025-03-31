@@ -16,20 +16,28 @@ const sketch = ({ context, width, height }) => {
 
   const rects = [];
 
+  const rectColors = [
+    random.pick(risoColors),
+    random.pick(risoColors),
+    random.pick(risoColors),
+  ];
+
+  const bg = random.pick(risoColors).hex;
+
   for (let i = 0; i < num; i++) {
     x = random.range(0, width);
     y = random.range(0, height);
     w = random.range(200, 600);
     h = random.range(40, 200);
 
-    fill = random.pick(risoColors).hex;
-    stroke = random.pick(risoColors).hex;
+    fill = random.pick(rectColors).hex;
+    stroke = random.pick(rectColors).hex;
 
     rects.push({ x, y, w, h, fill, stroke });
   }
 
   return ({ context, width, height }) => {
-    context.fillStyle = "white";
+    context.fillStyle = bg;
     context.fillRect(0, 0, width, height);
 
     rects.forEach((rect) => {
@@ -40,6 +48,7 @@ const sketch = ({ context, width, height }) => {
       context.translate(x, y);
       context.strokeStyle = stroke;
       context.fillStyle = fill;
+      context.lineWidth = 10;
 
       drawSkewedRect({ context, w, h, degrees });
       context.stroke();
