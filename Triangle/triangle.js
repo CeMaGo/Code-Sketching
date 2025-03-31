@@ -1,6 +1,7 @@
 const canvasSketch = require("canvas-sketch");
 const math = require("canvas-sketch-util/math");
 const random = require("canvas-sketch-util/random");
+const Color = require("canvas-sketch-util/color");
 const risoColors = require("riso-colors");
 
 const settings = {
@@ -10,6 +11,7 @@ const settings = {
 
 const sketch = ({ context, width, height }) => {
   let x, y, w, h, fill, stroke;
+  let shadowColor;
 
   const num = 20;
   const degrees = -30;
@@ -52,12 +54,19 @@ const sketch = ({ context, width, height }) => {
 
       drawSkewedRect({ context, w, h, degrees });
 
-      context.shadowColor = "black";
+      shadowColor = Color.offsetHSL(fill, 0, 0, -20);
+      shadowColor.rgba[3] = 0.5;
+
+      context.shadowColor = Color.style(shadowColor.rgba);
       context.shadowOffsetX = -10;
       context.shadowOffsetY = 20;
 
       context.fill();
       context.shadowColor = null;
+
+      context.lineWidth = 2;
+      context.strokeStyle = "black";
+      context.stroke();
 
       context.stroke();
 
