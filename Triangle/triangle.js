@@ -4,24 +4,32 @@ const random = require("canvas-sketch-util/random");
 
 const settings = {
   dimensions: [1080, 1080],
+  // animate: true,
 };
 
-const sketch = () => {
+const sketch = ({ context, width, height }) => {
   let x, y, w, h;
 
   const num = 20;
   const degrees = -30;
 
+  const rects = [];
+
+  for (let i = 0; i < num; i++) {
+    x = random.range(0, width);
+    y = random.range(0, height);
+    w = random.range(200, 600);
+    h = random.range(40, 200);
+
+    rects.push({ x, y, w, h });
+  }
+
   return ({ context, width, height }) => {
     context.fillStyle = "white";
     context.fillRect(0, 0, width, height);
 
-    for (let i = 0; i < num; i++) {
-      x = random.range(0, width);
-      y = random.range(0, height);
-      w = random.range(200, 600);
-      h = random.range(40, 200);
-
+    rects.forEach((rect) => {
+      const { x, y, w, h } = rect;
       // start a draw
       context.save();
       context.translate(x, y);
@@ -31,7 +39,7 @@ const sketch = () => {
       context.stroke();
 
       context.restore();
-    }
+    });
   };
 };
 
