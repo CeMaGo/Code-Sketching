@@ -39,7 +39,23 @@ const sketch = ({ width, height }) => {
     context.save();
     context.translate(mx, my);
     context.translate(cw * 0.5, ch * 0.5);
+    context.strokeStyle = "yellow";
+    context.lineWidth = 4;
 
+    // draw lines
+    for (let r = 0; r < rows; r++) {
+      context.beginPath();
+
+      for (let c = 0; c < cols; c++) {
+        const point = points[r * cols + c];
+
+        if (!c) context.moveTo(point.x, point.y);
+        else context.lineTo(point.x, point.y);
+      }
+      context.stroke();
+    }
+
+    // draw points
     points.forEach((point) => {
       point.draw(context);
     });
