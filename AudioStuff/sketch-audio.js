@@ -23,4 +23,6 @@ const addListeners = () => {
   });
 };
 
+addListener();
+
 canvasSketch(sketch, settings);
