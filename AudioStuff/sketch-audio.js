@@ -7,11 +7,29 @@ const settings = {
 
 let audio;
 let audioContext, audioData, sourceNode, analyserNode;
+let manager;
 
 const sketch = () => {
   return ({ context, width, height }) => {
     context.fillStyle = "white";
     context.fillRect(0, 0, width, height);
+
+    if (!audioContext) return;
+
+    analyserNode.getFloatFrequencyData(audioData);
+
+    const avg = getAverage(audioData);
+
+    context.save();
+    context.translate(width * 0.5, height * 0.5);
+    context.lineWidth = 10;
+
+    // for the shape:
+    context.beginPath();
+    context.arc(0, 0, Math.abs(avg + avg / 2), 0, Math.PI * 2);
+    context.stroke();
+
+    context.restore();
   };
 };
 
@@ -19,8 +37,13 @@ const addListeners = () => {
   window.addEventListener("mouseup", () => {
     if (!audioContext) createAudio();
 
-    if (audio.paused) audio.play();
-    else audio.pause();
+    if (audio.paused) {
+      audio.play();
+      manager.play();
+    } else {
+      audio.pause();
+      manager.pause();
+    }
   });
 };
 
@@ -37,8 +60,24 @@ const createAudio = () => {
   sourceNode.connect(analyserNode);
 
   audioData = new Float32Array(analyserNode.frequencyBinCount);
+
+  console.log("audioData:", audioData.length);
 };
 
-addListeners();
+const getAverage = (data) => {
+  let sum = 0;
 
-canvasSketch(sketch, settings);
+  for (let i = 0; i < data.length; i++) {
+    sum += data[i];
+  }
+
+  return sum / data.length;
+};
+
+const start = async () => {
+  addListeners();
+  manager = await canvasSketch(sketch, settings);
+  manager.pause();
+};
+
+start();
