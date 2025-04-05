@@ -9,7 +9,6 @@ let audio;
 const sketch = () => {
   audio = document.createElement("audio");
   audio.src = "audio/Ge Filter Fish - Baby Im Stuck in a Cone.mp3";
-  // audio.play();
 
   return ({ context, width, height }) => {
     context.fillStyle = "white";
@@ -23,6 +22,6 @@ const addListeners = () => {
   });
 };
 
-addListener();
+addListeners();
 
 canvasSketch(sketch, settings);
