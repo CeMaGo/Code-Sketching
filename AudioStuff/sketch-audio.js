@@ -18,7 +18,8 @@ const sketch = () => {
 
 const addListeners = () => {
   window.addEventListener("mouseup", () => {
-    audio.play();
+    if (audio.paused) audio.play();
+    else audio.pause();
   });
 };
 
