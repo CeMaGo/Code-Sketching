@@ -1,13 +1,16 @@
 const canvasSketch = require("canvas-sketch");
 const random = require("canvas-sketch-util/random");
+const math = require("canvas-sketch-util/math");
+const colormap = require("colormap");
 
 const settings = {
   dimensions: [1080, 1080],
+  animate: true,
 };
 
 const sketch = ({ width, height }) => {
-  const cols = 12;
-  const rows = 6;
+  const cols = 72;
+  const rows = 8;
   const numCells = cols * rows;
 
   // grid
@@ -19,14 +22,21 @@ const sketch = ({ width, height }) => {
   const ch = gh / rows;
 
   //margin
-  const mx = (width - gw) * 0.5;
+  const mx = (width - gw) * 0.8;
   const my = (height - gh) * 0.5;
 
   const points = [];
 
-  let x, y, n;
+  let x, y, n, lineWidth, color;
   let frequency = 0.002;
   let amplitute = 90;
+
+  let colors = colormap({
+    colormap: "rainbow-soft",
+    nshades: amplitute,
+    format: "hex",
+    alpha: 1,
+  });
 
   for (let i = 0; i < numCells; i++) {
     x = (i % cols) * cw;
@@ -36,7 +46,12 @@ const sketch = ({ width, height }) => {
     x += n;
     y += n;
 
-    points.push(new Point({ x, y }));
+    lineWidth = math.mapRange(n, -amplitute, amplitute, 0, 5);
+
+    color =
+      colors[Math.floor(math.mapRange(n, -amplitute, amplitute, 0, amplitute))];
+
+    points.push(new Point({ x, y, lineWidth, color }));
   }
 
   return ({ context, width, height }) => {
@@ -49,28 +64,38 @@ const sketch = ({ width, height }) => {
     context.strokeStyle = "yellow";
     context.lineWidth = 4;
 
+    let lastx, lasty;
+
     // draw lines
     for (let r = 0; r < rows; r++) {
-      context.beginPath();
-
       for (let c = 0; c < cols - 1; c++) {
         const curr = points[r * cols + c + 0];
         const next = points[r * cols + c + 1];
 
-        const mx = curr.x + (next.x - curr.x) * 0.5;
-        const my = curr.y + (next.y - curr.y) * 0.5;
+        const mx = curr.x + (next.x - curr.x) * 0.8;
+        const my = curr.y + (next.y - curr.y) * 5.5;
 
-        if (c == 0) context.moveTo(curr.x, curr.y);
-        else if (c == cols - 2)
-          context.quadraticCurveTo(curr.x, curr.y, next.x, next.y);
-        else context.quadraticCurveTo(curr.x, curr.y, mx, my);
+        if (!c) {
+          lastx = curr.x;
+          lasty = curr.y;
+        }
+
+        context.beginPath();
+        context.moveTo(lastx, lasty);
+
+        context.strokeStyle = curr.color;
+        context.lineWidth = curr.lineWidth;
+        context.quadraticCurveTo(curr.x, curr.y, mx, my);
+        context.stroke();
+
+        lastx = mx - (c / cols) * 250;
+        lasty = my - (r / rows) * 250;
       }
-      context.stroke();
     }
 
     // draw points
     points.forEach((point) => {
-      // point.draw(context);
+      //  point.draw(context);
     });
 
     context.restore();
@@ -80,9 +105,11 @@ const sketch = ({ width, height }) => {
 canvasSketch(sketch, settings);
 
 class Point {
-  constructor({ x, y }) {
+  constructor({ x, y, lineWidth, color }) {
     this.x = x;
     this.y = y;
+    this.lineWidth = lineWidth;
+    this.color = color;
   }
 
   draw(context) {
