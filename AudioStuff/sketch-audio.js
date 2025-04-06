@@ -1,4 +1,5 @@
 const canvasSketch = require("canvas-sketch");
+const math = require("canvas-sketch-util/math");
 
 const settings = {
   dimensions: [1080, 1080],
@@ -19,6 +20,19 @@ const sketch = () => {
     analyserNode.getFloatFrequencyData(audioData);
 
     const avg = getAverage(audioData);
+    const mapped = math.mapRange(
+      audioData[12],
+      analyserNode.minDecibels,
+      analyserNode.maxDecibels,
+      0,
+      1,
+      true,
+    );
+
+    //    const radius = Math.max(mapped * 200, 10);
+    const radius = mapped * 200;
+
+    // console.log("mapped:", mapped);
 
     context.save();
     context.translate(width * 0.5, height * 0.5);
@@ -26,7 +40,7 @@ const sketch = () => {
 
     // for the shape:
     context.beginPath();
-    context.arc(0, 0, Math.abs(avg + avg / 2), 0, Math.PI * 2);
+    context.arc(0, 0, radius, 0, Math.PI * 2);
     context.stroke();
 
     context.restore();
@@ -57,6 +71,7 @@ const createAudio = () => {
   sourceNode.connect(audioContext.destination);
 
   analyserNode = audioContext.createAnalyser();
+  analyserNode.fftSize = 512;
   sourceNode.connect(analyserNode);
 
   audioData = new Float32Array(analyserNode.frequencyBinCount);
