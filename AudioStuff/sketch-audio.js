@@ -11,17 +11,47 @@ let audioContext, audioData, sourceNode, analyserNode;
 let manager;
 
 const sketch = () => {
-  const bins = [4, 12, 37];
+  const numCircles = 5;
+  const numSlices = 9;
+  const slice = (Math.PI * 2) / numSlices;
+  const radius = 200;
+
+  //  const bins = [4, 12, 37];
 
   return ({ context, width, height }) => {
-    context.fillStyle = "white";
+    console.log("slice:", slice);
+
+    context.fillStyle = "#EEEAE0";
     context.fillRect(0, 0, width, height);
 
-    if (!audioContext) return;
+    // if (!audioContext) return;
 
-    analyserNode.getFloatFrequencyData(audioData);
+    //analyserNode.getFloatFrequencyData(audioData);
 
-    for (let i = 0; i < bins.length; i++) {
+    context.save();
+    context.translate(width * 0.5, height * 0.5);
+
+    for (let i = 0; i < numCircles; i++) {
+      context.save();
+      // context.rotate(slice);
+
+      for (let j = 0; j < numSlices; j++) {
+        context.lineWidth = 10;
+        context.rotate(slice);
+
+        // for the shape:
+        context.beginPath();
+        context.arc(0, 0, radius, 0, slice);
+        context.stroke();
+      }
+      context.restore();
+    }
+
+    context.restore();
+
+    // old loop simple circles
+
+    /*   for (let i = 0; i < bins.length; i++) {
       const bin = bins[i];
       const mapped = math.mapRange(
         audioData[bin],
@@ -32,20 +62,8 @@ const sketch = () => {
         true,
       );
 
-      const radius = Math.max(mapped * 200, 10);
-      // const radius = mapped * 300;
-
-      context.save();
-      context.translate(width * 0.5, height * 0.5);
-      context.lineWidth = 10;
-
-      // for the shape:
-      context.beginPath();
-      context.arc(0, 0, radius, 0, Math.PI * 2);
-      context.stroke();
-
-      context.restore();
-    }
+      const radius = Math.max(mapped * 300, 10);
+      // const radius = mapped * 300;}*/
   };
 };
 
