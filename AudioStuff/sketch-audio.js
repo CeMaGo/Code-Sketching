@@ -1,6 +1,6 @@
 const canvasSketch = require("canvas-sketch");
 const math = require("canvas-sketch-util/math");
-
+const eases = require("eases");
 const settings = {
   dimensions: [1080, 1080],
   animate: true,
@@ -11,39 +11,47 @@ let audioContext, audioData, sourceNode, analyserNode;
 let manager;
 
 const sketch = () => {
-  const numCircles = 5;
+  const numCircles = 7;
   const numSlices = 9;
   const slice = (Math.PI * 2) / numSlices;
-  const radius = 200;
+  const radius = 125;
 
-  //  const bins = [4, 12, 37];
+  const bins = [4, 12, 37];
+  const lineWidths = [];
+
+  let lineWidth;
+
+  for (let i = 0; i < numCircles; i++) {
+    const t = i / (numCircles - 1);
+    lineWidth = eases.quadIn(t) * 200;
+    lineWidths.push(lineWidth);
+  }
 
   return ({ context, width, height }) => {
-    console.log("slice:", slice);
-
     context.fillStyle = "#EEEAE0";
     context.fillRect(0, 0, width, height);
 
     // if (!audioContext) return;
-
     //analyserNode.getFloatFrequencyData(audioData);
 
     context.save();
     context.translate(width * 0.5, height * 0.5);
+    let cradius = radius;
 
     for (let i = 0; i < numCircles; i++) {
       context.save();
-      // context.rotate(slice);
 
       for (let j = 0; j < numSlices; j++) {
-        context.lineWidth = 10;
+        context.lineWidth = lineWidths[i];
         context.rotate(slice);
 
         // for the shape:
         context.beginPath();
-        context.arc(0, 0, radius, 0, slice);
+        context.arc(0, 0, cradius + context.lineWidth * 0.5, 0, slice);
         context.stroke();
       }
+
+      cradius += lineWidths[i];
       context.restore();
     }
 
