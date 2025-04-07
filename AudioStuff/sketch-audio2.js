@@ -14,18 +14,17 @@ let minDb, maxDb;
 
 const sketch = () => {
   const numCircles = 5; // 5
-  const numSlices = 9;
+  const numSlices = 1;
   const slice = (Math.PI * 2) / numSlices;
   const radius = 100;
 
   const bins = [];
   const lineWidths = [];
 
-  let lineWidth, bin, mapped;
+  let lineWidth, bin, mapped, phi;
 
   for (let i = 0; i < numCircles * numSlices; i++) {
     bin = random.rangeFloor(4, 64);
-    if (random.value() < 0.3) bin = 0;
     bins.push(bin);
   }
 
@@ -48,26 +47,23 @@ const sketch = () => {
 
     for (let i = 0; i < numCircles; i++) {
       context.save();
+      cradius += lineWidths[i] * 0.5 + 2;
 
       for (let j = 0; j < numSlices; j++) {
         context.rotate(slice);
         context.lineWidth = lineWidths[i];
 
         bin = bins[i * numSlices + j];
-        if (!bin) continue;
         mapped = math.mapRange(audioData[bin], minDb, maxDb, 0, 1, true);
 
-        lineWidth = lineWidths[i] * mapped;
-        if (lineWidth < 1) continue;
+        phi = slice * mapped;
 
-        context.lineWidth = lineWidth;
         // for the shape:
         context.beginPath();
-        context.arc(0, 0, cradius + context.lineWidth * 0.5, 0, slice);
+        context.arc(0, 0, cradius, 0, phi);
         context.stroke();
       }
-
-      cradius += lineWidths[i];
+      cradius += lineWidths[i] * 0.5;
       context.restore();
     }
 
@@ -91,8 +87,8 @@ const addListeners = () => {
 
 const createAudio = () => {
   audio = document.createElement("audio");
-  //audio.src = "audio/Ge Filter Fish - Baby Im Stuck in a Cone.mp3";
-  audio.src = "audio/epshy - BAD END.mp3";
+  audio.src = "audio/Ge Filter Fish - Baby Im Stuck in a Cone.mp3";
+  // audio.src = "audio/epshy - BAD END.mp3";
 
   audioContext = new AudioContext();
 
