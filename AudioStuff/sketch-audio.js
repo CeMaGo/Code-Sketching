@@ -1,5 +1,6 @@
 const canvasSketch = require("canvas-sketch");
 const math = require("canvas-sketch-util/math");
+const random = require("canvas-sketch-util/random");
 const eases = require("eases");
 const settings = {
   dimensions: [1080, 1080],
@@ -9,21 +10,27 @@ const settings = {
 let audio;
 let audioContext, audioData, sourceNode, analyserNode;
 let manager;
+let minDb, maxDb;
 
 const sketch = () => {
-  const numCircles = 7;
+  const numCircles = 5; // 5
   const numSlices = 9;
   const slice = (Math.PI * 2) / numSlices;
-  const radius = 125;
+  const radius = 100;
 
-  const bins = [4, 12, 37];
+  const bins = [];
   const lineWidths = [];
 
-  let lineWidth;
+  let lineWidth, bin, mapped;
+
+  for (let i = 0; i < numCircles * numSlices; i++) {
+    bin = random.rangeFloor(4, 64);
+    bins.push(bin);
+  }
 
   for (let i = 0; i < numCircles; i++) {
     const t = i / (numCircles - 1);
-    lineWidth = eases.quadIn(t) * 200;
+    lineWidth = eases.quadIn(t) * 200 + 20; // +20
     lineWidths.push(lineWidth);
   }
 
@@ -31,8 +38,8 @@ const sketch = () => {
     context.fillStyle = "#EEEAE0";
     context.fillRect(0, 0, width, height);
 
-    // if (!audioContext) return;
-    //analyserNode.getFloatFrequencyData(audioData);
+    if (!audioContext) return;
+    analyserNode.getFloatFrequencyData(audioData);
 
     context.save();
     context.translate(width * 0.5, height * 0.5);
@@ -42,9 +49,15 @@ const sketch = () => {
       context.save();
 
       for (let j = 0; j < numSlices; j++) {
-        context.lineWidth = lineWidths[i];
         context.rotate(slice);
+        context.lineWidth = lineWidths[i];
 
+        bin = bins[i * numSlices + j];
+        mapped = math.mapRange(audioData[bin], minDb, maxDb, 0, 1, true);
+
+        lineWidth = lineWidths[i] * mapped;
+
+        context.lineWidth = lineWidth;
         // for the shape:
         context.beginPath();
         context.arc(0, 0, cradius + context.lineWidth * 0.5, 0, slice);
@@ -56,22 +69,6 @@ const sketch = () => {
     }
 
     context.restore();
-
-    // old loop simple circles
-
-    /*   for (let i = 0; i < bins.length; i++) {
-      const bin = bins[i];
-      const mapped = math.mapRange(
-        audioData[bin],
-        analyserNode.minDecibels,
-        analyserNode.maxDecibels,
-        0,
-        1,
-        true,
-      );
-
-      const radius = Math.max(mapped * 300, 10);
-      // const radius = mapped * 300;}*/
   };
 };
 
@@ -102,6 +99,9 @@ const createAudio = () => {
   analyserNode.fftSize = 512;
   analyserNode.smoothingTimeConstant = 0.9;
   sourceNode.connect(analyserNode);
+
+  minDb = analyserNode.minDecibels;
+  maxDb = analyserNode.maxDecibels;
 
   audioData = new Float32Array(analyserNode.frequencyBinCount);
 
