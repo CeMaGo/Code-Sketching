@@ -25,6 +25,7 @@ const sketch = () => {
 
   for (let i = 0; i < numCircles * numSlices; i++) {
     bin = random.rangeFloor(4, 64);
+    if (random.value() < 0.3) bin = 0;
     bins.push(bin);
   }
 
@@ -53,9 +54,11 @@ const sketch = () => {
         context.lineWidth = lineWidths[i];
 
         bin = bins[i * numSlices + j];
+        if (!bin) continue;
         mapped = math.mapRange(audioData[bin], minDb, maxDb, 0, 1, true);
 
         lineWidth = lineWidths[i] * mapped;
+        if (lineWidth < 1) continue;
 
         context.lineWidth = lineWidth;
         // for the shape:
@@ -88,7 +91,8 @@ const addListeners = () => {
 
 const createAudio = () => {
   audio = document.createElement("audio");
-  audio.src = "audio/Ge Filter Fish - Baby Im Stuck in a Cone.mp3";
+  //audio.src = "audio/Ge Filter Fish - Baby Im Stuck in a Cone.mp3";
+  audio.src = "audio/epshy - BAD END.mp3";
 
   audioContext = new AudioContext();
 
