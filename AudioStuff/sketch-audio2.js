@@ -20,6 +20,7 @@ const sketch = () => {
 
   const bins = [];
   const lineWidths = [];
+  const rotationOffsets = [];
 
   let lineWidth, bin, mapped, phi;
 
@@ -30,8 +31,14 @@ const sketch = () => {
 
   for (let i = 0; i < numCircles; i++) {
     const t = i / (numCircles - 1);
-    lineWidth = eases.quadIn(t) * 200 + 20; // +20
+    lineWidth = eases.quadIn(t) * 200 + 10; // +20
     lineWidths.push(lineWidth);
+  }
+
+  for (let i = 0; i < numCircles; i++) {
+    rotationOffsets.push(
+      random.range(Math.PI * -0.25, Math.PI * 0.25) - Math.PI * 0.5,
+    );
   }
 
   return ({ context, width, height }) => {
@@ -43,10 +50,13 @@ const sketch = () => {
 
     context.save();
     context.translate(width * 0.5, height * 0.5);
+    context.scale(1, -1);
+
     let cradius = radius;
 
     for (let i = 0; i < numCircles; i++) {
       context.save();
+      context.rotate(rotationOffsets[i]);
       cradius += lineWidths[i] * 0.5 + 2;
 
       for (let j = 0; j < numSlices; j++) {
