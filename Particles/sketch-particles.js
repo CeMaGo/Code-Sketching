@@ -84,11 +84,21 @@ class Particle {
 
     this.minDist = 100;
     this.pushFactor = 0.02;
+    this.pullFactor = 0.004;
+    this.dampFactor = 0.95;
   }
 
   update() {
     let dx, dy, dd, distDelta;
 
+    //Pullforce
+    dx = this.ix - this.x;
+    dy = this.iy - this.y;
+
+    this.ax = dx * this.pullFactor;
+    this.ay = dy * this.pullFactor;
+
+    //Pushforce
     dx = this.x - cursor.x;
     dy = this.y - cursor.y;
     dd = Math.sqrt(dx * dx + dy * dy);
@@ -96,12 +106,15 @@ class Particle {
     distDelta = this.minDist - dd;
 
     if (dd < this.minDist) {
-      this.ax = (dx / dd) * distDelta * this.pushFactor;
-      this.ay = (dy / dd) * distDelta * this.pushFactor;
+      this.ax += (dx / dd) * distDelta * this.pushFactor;
+      this.ay += (dy / dd) * distDelta * this.pushFactor;
     }
 
     this.vx += this.ax;
     this.vy += this.ay;
+
+    this.vx *= this.dampFactor;
+    this.vy *= this.dampFactor;
 
     this.x += this.vx;
     this.y += this.vy;
