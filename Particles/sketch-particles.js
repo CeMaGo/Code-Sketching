@@ -81,10 +81,24 @@ class Particle {
     this.iy = y;
 
     this.radius = radius;
+
+    this.minDist = 100;
+    this.pushFactor = 0.02;
   }
 
   update() {
-    this.ax += 0.001;
+    let dx, dy, dd, distDelta;
+
+    dx = this.x - cursor.x;
+    dy = this.y - cursor.y;
+    dd = Math.sqrt(dx * dx + dy * dy);
+
+    distDelta = this.minDist - dd;
+
+    if (dd < this.minDist) {
+      this.ax = (dx / dd) * distDelta * this.pushFactor;
+      this.ay = (dy / dd) * distDelta * this.pushFactor;
+    }
 
     this.vx += this.ax;
     this.vy += this.ay;
