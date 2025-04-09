@@ -1,5 +1,6 @@
 const canvasSketch = require("canvas-sketch");
 const random = require("canvas-sketch-util/random");
+const eases = require("eases");
 
 const settings = {
   dimensions: [1080, 1080],
@@ -47,7 +48,7 @@ const sketch = ({ width, height, canvas }) => {
     }
 
     cirRadius += fitRadius * 2 + gapCircle;
-    dotRadius = (1 - i / numCircles) * fitRadius;
+    dotRadius = (1 - eases.quadOut(i / numCircles)) * fitRadius;
   }
 
   /*
@@ -125,9 +126,9 @@ class Particle {
     this.radius = radius;
 
     this.minDist = 100;
-    this.pushFactor = 0.02;
-    this.pullFactor = 0.004;
-    this.dampFactor = 0.95;
+    this.pushFactor = random.range(0.01, 0.02);
+    this.pullFactor = random.range(0.02, 0.06);
+    this.dampFactor = random.range(0.9, 0.95);
   }
 
   update() {
