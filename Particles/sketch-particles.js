@@ -2,13 +2,19 @@ const canvasSketch = require("canvas-sketch");
 
 const settings = {
   dimensions: [1080, 1080],
-  animate: true;
+  animate: true,
 };
 
 const particles = [];
+const cursor = { x: 9999, y: 9999 };
 
-const sketch = ({ width, height }) => {
+let elCanvas;
+
+const sketch = ({ width, height, canvas }) => {
   let x, y, particle;
+  elCanvas = canvas;
+
+  canvas.addEventListener("mousedown", onMouseDown);
 
   for (let i = 0; i < 1; i++) {
     x = width * 0.5;
@@ -27,6 +33,31 @@ const sketch = ({ width, height }) => {
       particle.draw(context);
     });
   };
+};
+
+onMouseDown = (e) => {
+  window.addEventListener("mousemove", onMouseMove);
+  window.addEventListener("mouseUp", onMouseUp);
+
+  onMouseMove(e);
+};
+
+const onMouseMove = (e) => {
+  const x = (e.offsetX / elCanvas.offsetWidth) * elCanvas.width;
+  const y = (e.offsetY / elCanvas.offsetHeight) * elCanvas.height;
+
+  cursor.x = x;
+  cursor.y = y;
+
+  console.log("cursor position:", cursor);
+};
+
+const onMouseUp = () => {
+  window.removeEventListener("mousemove", onMouseMove);
+  window.removeEventListener("mouseup", onMouseUp);
+
+  cursor.x = 9999;
+  cursor.y = 9999;
 };
 
 canvasSketch(sketch, settings);
@@ -53,14 +84,14 @@ class Particle {
   }
 
   update() {
-this.ax += 0.001;
+    this.ax += 0.001;
 
     this.vx += this.ax;
     this.vy += this.ay;
 
     this.x += this.vx;
     this.y += this.vy;
-  } 
+  }
 
   draw(context) {
     context.save();
