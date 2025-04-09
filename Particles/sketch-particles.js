@@ -2,6 +2,7 @@ const canvasSketch = require("canvas-sketch");
 
 const settings = {
   dimensions: [1080, 1080],
+  animate: true;
 };
 
 const particles = [];
@@ -22,6 +23,7 @@ const sketch = ({ width, height }) => {
     context.fillRect(0, 0, width, height);
 
     particles.forEach((particle) => {
+      particle.update();
       particle.draw(context);
     });
   };
@@ -31,10 +33,34 @@ canvasSketch(sketch, settings);
 
 class Particle {
   constructor({ x, y, radius = 10 }) {
+    //position
     this.x = x;
     this.y = y;
+
+    //acceleraion
+    this.ax = 0;
+    this.ay = 0;
+
+    // velocity
+    this.vx = 0;
+    this.vy = 0;
+
+    // initial position
+    this.ix = x;
+    this.iy = y;
+
     this.radius = radius;
   }
+
+  update() {
+this.ax += 0.001;
+
+    this.vx += this.ax;
+    this.vy += this.ay;
+
+    this.x += this.vx;
+    this.y += this.vy;
+  } 
 
   draw(context) {
     context.save();
