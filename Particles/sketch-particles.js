@@ -35,6 +35,9 @@ const sketch = ({ width, height, canvas }) => {
       x = Math.cos(theta) * cirRadius;
       y = Math.sin(theta) * cirRadius;
 
+      x += width * 0.5;
+      y += height * 0.5;
+
       particle = new Particle({ x, y });
       particles.push(particle);
     }
