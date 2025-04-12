@@ -125,7 +125,7 @@ class Particle {
 
     this.radius = radius;
 
-    this.minDist = 100;
+    this.minDist = random.range(100, 200);
     this.pushFactor = random.range(0.01, 0.02);
     this.pullFactor = random.range(0.02, 0.06);
     this.dampFactor = random.range(0.9, 0.95);
