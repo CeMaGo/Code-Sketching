@@ -1,7 +1,7 @@
 const canvasSketch = require("canvas-sketch");
 const random = require("canvas-sketch-util/random");
 const eases = require("eases");
-const math = require("canvas-sketch-utils/math");
+const math = require("canvas-sketch-util/math");
 
 const settings = {
   dimensions: [1080, 1080],
@@ -151,14 +151,6 @@ class Particle {
     dy = this.y - cursor.y;
     dd = Math.sqrt(dx * dx + dy * dy);
 
-    this.ax = dx * this.pullFactor;
-    this.ay = dy * this.pullFactor;
-
-    //Pushforce
-    dx = this.x - cursor.x;
-    dy = this.y - cursor.y;
-    dd = Math.sqrt(dx * dx + dy * dy);
-
     distDelta = this.minDist - dd;
 
     if (dd < this.minDist) {
@@ -182,7 +174,7 @@ class Particle {
     context.fillStyle = "white";
 
     context.beginPath();
-    context.arc(0, 0, this.radius, this.scale, 0, Math.PI * 2);
+    context.arc(0, 0, this.radius * this.scale, 0, Math.PI * 2);
     context.fill();
     context.restore();
   }
