@@ -3,6 +3,7 @@ const random = require("canvas-sketch-util/random");
 const eases = require("eases");
 const math = require("canvas-sketch-util/math");
 const colormap = require("colormap");
+const interpolate = require("color-interpolate");
 
 const settings = {
   dimensions: [1080, 1080],
@@ -19,6 +20,7 @@ const colors = colormap({
 
 let elCanvas;
 let imgA;
+let imgB;
 
 const sketch = ({ width, height, canvas }) => {
   let x, y, particle, radius;
@@ -26,12 +28,20 @@ const sketch = ({ width, height, canvas }) => {
   const imgACanvas = document.createElement("canvas");
   const imgAContext = imgACanvas.getContext("2d");
 
+  const imgBCanvas = document.createElement("canvas");
+  const imgBContext = imgACanvas.getContext("2d");
+
   imgACanvas.width = imgA.width;
   imgACanvas.height = imgA.height;
 
+  imgBCanvas.width = imgA.width;
+  imgBCanvas.height = imgA.height;
+
   imgAContext.drawImage(imgA, 0, 0);
+  imgBContext.drawImage(imgB, 0, 0);
 
   const imgAData = imgAContext.getImageData(0, 0, imgA.width, imgA.height).data;
+  const imgBData = imgBContext.getImageData(0, 0, imgB.width, imgB.height).data;
 
   const numCircles = 30;
   const gapCircle = 2;
@@ -48,7 +58,7 @@ const sketch = ({ width, height, canvas }) => {
     const circumference = Math.PI * 2 * cirRadius;
     const numFit = i ? Math.floor(circumference / (fitRadius * 2 + gapDot)) : 1;
     const fitSlice = (Math.PI * 2) / numFit;
-    let ix, iy, idx, r, g, b, colA;
+    let ix, iy, idx, r, g, b, colA, colB, colMap;
 
     for (let j = 0; j < numFit; j++) {
       const theta = fitSlice * j;
@@ -71,7 +81,14 @@ const sketch = ({ width, height, canvas }) => {
       // radius = dotRadius;
       radius = math.mapRange(r, 0, 255, 1, 12);
 
-      particle = new Particle({ x, y, radius, colA });
+      r = imgBData[idx + 0];
+      g = imgBData[idx + 1];
+      b = imgBData[idx + 2];
+      colB = `rgb(${r}, ${g}, ${b})`;
+
+      colMap = interpolate([colA, colB]);
+
+      particle = new Particle({ x, y, radius, colMap });
       particles.push(particle);
     }
 
@@ -146,6 +163,7 @@ const loadImage = async (url) => {
 
 const start = async () => {
   imgA = await loadImage("images/image-09.png");
+  imgB = await loadImage("images/image-02.png");
 
   canvasSketch(sketch, settings);
 };
@@ -153,7 +171,7 @@ const start = async () => {
 start();
 
 class Particle {
-  constructor({ x, y, radius = 10, colA }) {
+  constructor({ x, y, radius = 10, colMap }) {
     //position
     this.x = x;
     this.y = y;
@@ -172,7 +190,8 @@ class Particle {
 
     this.radius = radius;
     this.scale = 1;
-    this.color = colA;
+    this.colMap = colMap;
+    this.color = colMap(0);
 
     this.minDist = random.range(100, 200);
     this.pushFactor = random.range(0.01, 0.02);
@@ -196,6 +215,8 @@ class Particle {
 
     // idxColor = Math.floor(math.mapRange(dd, 0, 200, colors.length - 1, true));
     //this.color = colors[idxColor];
+
+    this.color = this.colMap(math.mapRange(dd, 0, 200, 0, 1, true));
 
     //Pushforce
     dx = this.x - cursor.x;
